@@ -73,13 +73,12 @@ def tinyMazeSearch(problem):
     return  [s, s, w, s, w, w, s, w]
 
 
-def search(problem, mode):
-
+def search(problem, mode, heuirstic):
     if mode == "dfs":
         work_list = util.Stack()
     elif mode == "bfs":
         work_list = util.Queue()
-    elif mode == "ucs":
+    elif mode == "ucs" or mode == "astar":
 	work_list = util.PriorityQueue()
     else:
 	return None
@@ -126,7 +125,14 @@ def search(problem, mode):
             else:
 		next_node_cost = curr_cost + cost
                 next_node_and_path_and_cost =  (next_node, path_to_next_node, next_node_cost)
-            	work_list.push(next_node_and_path_and_cost, next_node_cost)
+		if mode == "ucs":
+		    # if mode is ucs, cost is uniform and the priority is the cost. 
+            	    work_list.push(next_node_and_path_and_cost, next_node_cost)
+		else:
+		    # if we are doing astar, we will have a cost function which will change priority
+		    next_node_priority = next_node_cost + heuirstic(next_node, problem)
+            	    work_list.push(next_node_and_path_and_cost, next_node_priority)
+  		    
     return None
 
 def depthFirstSearch(problem):
@@ -144,7 +150,7 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    result = search(problem, "dfs")
+    result = search(problem, "dfs", None)
     if result != None:
         return result
     util.raiseNotDefined()
@@ -153,7 +159,7 @@ def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
     # Since this is a DFS we are using a stack.
-    result = search(problem, "bfs")
+    result = search(problem, "bfs", None)
     if result != None:
         return result
     util.raiseNotDefined()
@@ -161,7 +167,7 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    result = search(problem, "ucs")
+    result = search(problem, "ucs", None)
     if result != None:
         return result
     util.raiseNotDefined()
@@ -176,6 +182,9 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    result = search(problem, "astar", heuristic)
+    if result != None:
+	return result
     util.raiseNotDefined()
 
 
