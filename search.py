@@ -72,6 +72,37 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
+
+def search(problem, work_list):
+    start_node = problem.getStartState()
+    # check if we are already at the goal.
+    if problem.isGoalState(start_node):
+        return []
+	
+    start_node_and_path = (start_node, [])
+    work_list.push(start_node_and_path)
+
+    # Lookup set for retrieving visited_nodes in O(1) time complexity.
+    visited_set = {}
+    while not(work_list.isEmpty()):
+        curr_node, path_to_curr_node = work_list.pop()
+	# uses o(1) lookup by hashing it as visited_set is a python dict.
+	if curr_node in visited_set:
+            continue
+
+	# mark this node as visited
+	visited_set[curr_node] = True
+
+        if problem.isGoalState(curr_node):
+            return path_to_curr_node
+
+        # relative_path_to_next_node is how to get to next node from curr_node.
+        for next_node, relative_path_to_next_node, _ in problem.getSuccessors(curr_node):
+            path_to_next_node = path_to_curr_node + [relative_path_to_next_node]
+            next_node_and_path = (next_node, path_to_next_node)
+            work_list.push(next_node_and_path)
+    return None
+
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
@@ -87,11 +118,21 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
+    # Since this is a DFS we are using a stack.
+    work_list = util.Stack()
+    result = search(problem, work_list)
+    if result != None:
+        return result
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+    # Since this is a DFS we are using a stack.
+    work_list = util.Queue()
+    result = search(problem, work_list)
+    if result != None:
+        return result
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
