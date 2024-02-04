@@ -73,7 +73,15 @@ def tinyMazeSearch(problem):
     return  [s, s, w, s, w, w, s, w]
 
 
-def search(problem, work_list):
+def search(problem, mode):
+
+    if mode == "dfs":
+        work_list = util.Stack()
+    elif mode == "bfs":
+        work_list = util.Queue()
+    else:
+	return None
+
     start_node = problem.getStartState()
     # check if we are already at the goal.
     if problem.isGoalState(start_node):
@@ -118,9 +126,7 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    # Since this is a DFS we are using a stack.
-    work_list = util.Stack()
-    result = search(problem, work_list)
+    result = search(problem, "dfs")
     if result != None:
         return result
     util.raiseNotDefined()
@@ -129,8 +135,7 @@ def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
     # Since this is a DFS we are using a stack.
-    work_list = util.Queue()
-    result = search(problem, work_list)
+    result = search(problem, "bfs")
     if result != None:
         return result
     util.raiseNotDefined()
