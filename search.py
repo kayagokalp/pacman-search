@@ -79,6 +79,8 @@ def search(problem, mode):
         work_list = util.Stack()
     elif mode == "bfs":
         work_list = util.Queue()
+    elif mode == "ucs":
+	work_list = util.PriorityQueue()
     else:
 	return None
 
@@ -87,13 +89,24 @@ def search(problem, mode):
     if problem.isGoalState(start_node):
         return []
 	
-    start_node_and_path = (start_node, [])
-    work_list.push(start_node_and_path)
+
+    if mode == "bfs" or mode == "dfs":
+    	start_node_and_path = (start_node, [])
+    	work_list.push(start_node_and_path)
+    else:
+	start_node_cost = 0 
+	start_node_priority = 0
+	start_node_and_path_with_cost = (start_node, [], 0)
+	work_list.push(start_node_and_path_with_cost, start_node_priority)
 
     # Lookup set for retrieving visited_nodes in O(1) time complexity.
     visited_set = {}
     while not(work_list.isEmpty()):
-        curr_node, path_to_curr_node = work_list.pop()
+	if mode == "bfs" or mode == "dfs":
+            curr_node, path_to_curr_node = work_list.pop()
+        else:
+            curr_node, path_to_curr_node, curr_cost = work_list.pop()
+
 	# uses o(1) lookup by hashing it as visited_set is a python dict.
 	if curr_node in visited_set:
             continue
@@ -105,10 +118,15 @@ def search(problem, mode):
             return path_to_curr_node
 
         # relative_path_to_next_node is how to get to next node from curr_node.
-        for next_node, relative_path_to_next_node, _ in problem.getSuccessors(curr_node):
+        for next_node, relative_path_to_next_node, cost in problem.getSuccessors(curr_node):
             path_to_next_node = path_to_curr_node + [relative_path_to_next_node]
-            next_node_and_path = (next_node, path_to_next_node)
-            work_list.push(next_node_and_path)
+	    if mode == "bfs" or mode == "dfs":
+                next_node_and_path = (next_node, path_to_next_node)
+            	work_list.push(next_node_and_path)
+            else:
+		next_node_cost = curr_cost + cost
+                next_node_and_path_and_cost =  (next_node, path_to_next_node, next_node_cost)
+            	work_list.push(next_node_and_path_and_cost, next_node_cost)
     return None
 
 def depthFirstSearch(problem):
@@ -143,6 +161,9 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
+    result = search(problem, "ucs")
+    if result != None:
+        return result
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
